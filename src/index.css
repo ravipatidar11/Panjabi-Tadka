@@ -1,0 +1,44 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    font-family: 'Manrope', sans-serif;
+    background-color: #F4F1EA;
+    color: #1A1A1A;
+    overflow-x: hidden;
+  }
+}
+
+.font-serif {
+  font-family: 'Source Serif 4', Georgia, serif;
+}
+
+.font-sans {
+  font-family: 'Manrope', sans-serif;
+}
+
+/* Editorial aesthetic utility classes */
+.editorial-border {
+  border-color: #DED9CF;
+}
+
+.editorial-[#EBE7DF] {
+  background-color: #EBE7DF;
+}
+
+/* Smooth custom scrollbars in editorial palette */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #EBE7DF;
+}
+::-webkit-scrollbar-thumb {
+  background: #C4BCAE;
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #B84A0E;
+}
+

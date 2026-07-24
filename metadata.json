@@ -1,0 +1,6 @@
+{
+  "name": "Punjabi Tadka",
+  "description": "Authentic Punjabi dining, catering, and online reservation experience with flavor-forward authenticity.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
