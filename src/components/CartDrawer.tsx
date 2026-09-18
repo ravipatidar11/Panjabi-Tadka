@@ -19,15 +19,14 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
   onRemoveItem,
   onClearCart
 }) => {
-  if (!isOpen) return null;
-
   const [orderType, setOrderType] = useState<'pickup' | 'delivery'>('pickup');
   const [address, setAddress] = useState('');
   const [phone, setPhone] = useState('');
   const [customerName, setCustomerName] = useState('');
   const [tipPercent, setTipPercent] = useState<number>(18);
-  const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [placedOrderCode, setPlacedOrderCode] = useState<string | null>(null);
+
+  if (!isOpen) return null;
 
   const subtotal = cart.reduce((acc, c) => acc + c.item.price * c.quantity, 0);
   const tax = subtotal * 0.085;
@@ -120,7 +119,6 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                 onClick={() => {
                   onClearCart();
                   setPlacedOrderCode(null);
-                  setIsCheckingOut(false);
                   onClose();
                 }}
                 className="w-full py-3 bg-[#B84A0E] hover:bg-[#9B3C09] text-[#F4F1EA] font-bold text-xs uppercase tracking-widest border border-[#B84A0E]"

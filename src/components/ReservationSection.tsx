@@ -158,7 +158,7 @@ export const ReservationSection: React.FC = () => {
                   </label>
                   <select
                     value={seatingPreference}
-                    onChange={(e) => setSeatingPreference(e.target.value as any)}
+                    onChange={(e) => setSeatingPreference(e.target.value as typeof seatingPreference)}
                     className="w-full px-4 py-2.5 bg-[#1A1A1A] border border-[#524C42] text-[#F4F1EA] text-xs font-medium focus:outline-hidden focus:border-[#B84A0E]"
                   >
                     <option value="indoor">Main Dining Hall</option>
