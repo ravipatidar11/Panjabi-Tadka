@@ -1,44 +1,68 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Yeseva+One&display=swap');
 @import "tailwindcss";
 
 @layer base {
   body {
-    font-family: 'Manrope', sans-serif;
-    background-color: #F4F1EA;
-    color: #1A1A1A;
+    font-family: 'DM Sans', sans-serif;
+    background-color: #FBF3DF;
+    color: #3B0D0D;
     overflow-x: hidden;
+    background-image: linear-gradient(90deg, rgba(198, 122, 34, 0.06) 1px, transparent 1px), linear-gradient(rgba(198, 122, 34, 0.06) 1px, transparent 1px);
+    background-size: 28px 28px;
   }
 }
 
 .font-serif {
-  font-family: 'Source Serif 4', Georgia, serif;
+  font-family: 'Yeseva One', Georgia, serif;
 }
 
 .font-sans {
-  font-family: 'Manrope', sans-serif;
+  font-family: 'DM Sans', sans-serif;
 }
 
-/* Editorial aesthetic utility classes */
+/* Indian restaurant palette overrides shared by the existing utility classes. */
+[class*="bg-[#F4F1EA]"] { background-color: #FBF3DF !important; }
+[class*="bg-[#EBE7DF]"] { background-color: #F3E3C1 !important; }
+[class*="bg-[#FAF8F5]"] { background-color: #FFF9ED !important; }
+[class*="bg-[#1A1A1A]"] { background-color: #3B0D0D !important; }
+[class*="bg-[#2A2824]"] { background-color: #5B1A16 !important; }
+[class*="text-[#F4F1EA]"] { color: #FBF3DF !important; }
+[class*="text-[#1A1A1A]"] { color: #3B0D0D !important; }
+[class*="text-[#B84A0E]"] { color: #D97706 !important; }
+[class*="text-[#C8C2B6]"] { color: #E8D4B0 !important; }
+[class*="text-[#A39D90]"] { color: #C9AB83 !important; }
+[class*="text-[#666157]"] { color: #7A5A44 !important; }
+[class*="text-[#524C42]"] { color: #5C3A2E !important; }
+[class*="border-[#DED9CF]"] { border-color: #E7CFA8 !important; }
+[class*="border-[#38342E]"] { border-color: #7C3F2C !important; }
+[class*="border-[#524C42]"] { border-color: #A66A3F !important; }
+[class*="border-[#B84A0E]"] { border-color: #D97706 !important; }
+[class*="hover:bg-[#9B3C09]"]:hover { background-color: #9A3412 !important; }
+[class*="hover:bg-[#B84A0E]"]:hover { background-color: #C2410C !important; }
+[class*="hover:text-[#B84A0E]"]:hover { color: #C2410C !important; }
+[class*="hover:border-[#B84A0E]"]:hover { border-color: #D97706 !important; }
+
 .editorial-border {
-  border-color: #DED9CF;
+  border-color: #E7CFA8;
 }
 
-.editorial-#EBE7DF {
-  background-color: #EBE7DF;
+.editorial-surface {
+  background-color: #F3E3C1;
 }
 
-/* Smooth custom scrollbars in editorial palette */
+/* Warm, spice-toned scrollbar. */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #EBE7DF;
+  background: #F3E3C1;
 }
 ::-webkit-scrollbar-thumb {
-  background: #C4BCAE;
+  background: #C98B3C;
   border-radius: 2px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #B84A0E;
+  background: #C2410C;
 }
 

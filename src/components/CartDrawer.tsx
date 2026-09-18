@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { CartItem, SpiceLevel } from '../types';
 import { X, Trash2, Plus, Minus, ShoppingBag, Flame, Clock, MapPin, CheckCircle, ArrowRight, Truck, Store } from 'lucide-react';
+import { formatINR } from '../utils/currency';
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -9,6 +10,14 @@ interface CartDrawerProps {
   onUpdateQuantity: (index: number, newQty: number) => void;
   onRemoveItem: (index: number) => void;
   onClearCart: () => void;
+  onPlaceOrder: (payload: {
+    customerName: string;
+    phone: string;
+    address?: string;
+    orderType: 'pickup' | 'delivery';
+    tipPercent: number;
+    items: CartItem[];
+  }) => Promise<string>;
 }
 
 export const CartDrawer: React.FC<CartDrawerProps> = ({
@@ -17,7 +26,8 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
   cart,
   onUpdateQuantity,
   onRemoveItem,
-  onClearCart
+  onClearCart,
+  onPlaceOrder
 }) => {
   const [orderType, setOrderType] = useState<'pickup' | 'delivery'>('pickup');
   const [address, setAddress] = useState('');
@@ -25,17 +35,29 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
   const [customerName, setCustomerName] = useState('');
   const [tipPercent, setTipPercent] = useState<number>(18);
   const [placedOrderCode, setPlacedOrderCode] = useState<string | null>(null);
+  const [orderError, setOrderError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (!isOpen) return null;
 
   const subtotal = cart.reduce((acc, c) => acc + c.item.price * c.quantity, 0);
-  const tax = subtotal * 0.085;
-  const deliveryFee = orderType === 'delivery' ? 3.99 : 0;
+  const tax = subtotal * 0.05;
+  const deliveryFee = orderType === 'delivery' ? 335 : 0;
   const tipAmount = subtotal * (tipPercent / 100);
   const total = subtotal + tax + deliveryFee + tipAmount;
 
-  const handlePlaceOrder = (e: React.FormEvent) => {
+  const handlePlaceOrder = async (e: React.FormEvent) => {
     e.preventDefault();
+        setOrderError(null);
+        setIsSubmitting(true);
+        try {
+          const orderCode = await onPlaceOrder({ customerName, phone, address, orderType, tipPercent, items: cart });
+          setPlacedOrderCode(orderCode);
+        } catch (error) {
+          setOrderError(error instanceof Error ? error.message : 'Unable to place your order.');
+        } finally {
+          setIsSubmitting(false);
+        }
     if (!customerName || !phone) {
       alert('Please enter your name and phone number for order updates.');
       return;
@@ -59,7 +81,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
           <div className="p-5 border-b border-[#DED9CF] bg-[#F4F1EA] flex items-center justify-between">
             <div className="flex items-center gap-2">
               <ShoppingBag className="w-5 h-5 text-[#B84A0E]" />
-              <h2 className="font-serif text-xl font-bold text-[#1A1A1A]">Your Order • Gazette Dispatch</h2>
+              <h2 className="font-serif text-xl font-bold text-[#1A1A1A]">Your Order • Rasoi Thali</h2>
               <span className="bg-[#B84A0E] text-[#F4F1EA] text-[10px] font-bold px-2 py-0.5 border border-[#B84A0E]">
                 {cart.reduce((a, b) => a + b.quantity, 0)} Items
               </span>
@@ -101,7 +123,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                 </div>
                 <div className="flex justify-between">
                   <span className="text-[#666157] uppercase tracking-wider font-semibold">Total Charged:</span>
-                  <span className="font-serif font-bold text-sm text-[#B84A0E]">${total.toFixed(2)}</span>
+                  <span className="font-serif font-bold text-sm text-[#B84A0E]">{formatINR(total)}</span>
                 </div>
               </div>
 
@@ -193,7 +215,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                         <p className="text-[10px] text-[#B84A0E] font-serif italic truncate mt-0.5">"{c.specialInstructions}"</p>
                       )}
                       <div className="font-serif font-bold text-xs text-[#B84A0E] mt-1">
-                        ${(c.item.price * c.quantity).toFixed(2)}
+                        {formatINR(c.item.price * c.quantity)}
                       </div>
                     </div>
 
@@ -281,25 +303,25 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
               <div className="space-y-1 text-xs text-[#666157]">
                 <div className="flex justify-between">
                   <span>Subtotal:</span>
-                  <span className="font-bold text-[#1A1A1A]">${subtotal.toFixed(2)}</span>
+                  <span className="font-bold text-[#1A1A1A]">{formatINR(subtotal)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Sales Tax (8.5%):</span>
-                  <span>${tax.toFixed(2)}</span>
+                  <span>GST (5%):</span>
+                  <span>{formatINR(tax)}</span>
                 </div>
                 {orderType === 'delivery' && (
                   <div className="flex justify-between">
                     <span>Delivery Fee:</span>
-                    <span>${deliveryFee.toFixed(2)}</span>
+                    <span>{formatINR(deliveryFee)}</span>
                   </div>
                 )}
                 <div className="flex justify-between">
                   <span>Gratuity Tip ({tipPercent}%):</span>
-                  <span>${tipAmount.toFixed(2)}</span>
+                  <span>{formatINR(tipAmount)}</span>
                 </div>
                 <div className="pt-2 border-t border-[#DED9CF] flex justify-between items-center text-sm font-serif font-bold text-[#1A1A1A]">
                   <span className="uppercase tracking-wider text-[10px]">Total Amount:</span>
-                  <span className="text-xl text-[#B84A0E]">${total.toFixed(2)}</span>
+                  <span className="text-xl text-[#B84A0E]">{formatINR(total)}</span>
                 </div>
               </div>
 
@@ -308,9 +330,10 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                 onClick={handlePlaceOrder}
                 className="w-full py-3 bg-[#B84A0E] hover:bg-[#9B3C09] text-[#F4F1EA] font-bold text-xs uppercase tracking-widest border border-[#B84A0E] transition-all flex items-center justify-center gap-2"
               >
-                <span>Place Order (${total.toFixed(2)})</span>
+                <span>{isSubmitting ? 'Placing Order...' : `Place Order (${formatINR(total)})`}</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
+              {orderError && <p className="text-xs text-red-700" role="alert">{orderError}</p>}
             </div>
           )}
 

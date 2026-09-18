@@ -1,14 +1,15 @@
 import React, { useState, useMemo } from 'react';
-import { MENU_ITEMS } from '../data/menuData';
 import { MenuItem, SpiceLevel } from '../types';
 import { Search, Flame, Plus, Sparkles, Filter, Check } from 'lucide-react';
+import { formatINR } from '../utils/currency';
 
 interface MenuSectionProps {
+  items: MenuItem[];
   onSelectItem: (item: MenuItem) => void;
   onQuickAdd: (item: MenuItem, quantity: number, spiceLevel: SpiceLevel, instructions: string) => void;
 }
 
-export const MenuSection: React.FC<MenuSectionProps> = ({ onSelectItem, onQuickAdd }) => {
+export const MenuSection: React.FC<MenuSectionProps> = ({ items, onSelectItem, onQuickAdd }) => {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [dietaryFilter, setDietaryFilter] = useState<'all' | 'veg' | 'nonveg' | 'gf'>('all');
@@ -25,7 +26,7 @@ export const MenuSection: React.FC<MenuSectionProps> = ({ onSelectItem, onQuickA
   ];
 
   const filteredItems = useMemo(() => {
-    return MENU_ITEMS.filter((item) => {
+    return items.filter((item) => {
       if (selectedCategory !== 'all' && item.category !== selectedCategory) {
         return false;
       }
@@ -53,7 +54,7 @@ export const MenuSection: React.FC<MenuSectionProps> = ({ onSelectItem, onQuickA
         <div className="text-center max-w-3xl mx-auto space-y-3 mb-10 border-b border-[#DED9CF] pb-8">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#EBE7DF] border border-[#DED9CF] text-[#B84A0E] text-[10px] font-bold uppercase tracking-[0.2em]">
             <Flame className="w-3.5 h-3.5 fill-[#B84A0E]" />
-            <span>Gazette Selection • Clay Tandoor & Heritage Spice Recipes</span>
+            <span>Rasoi Selection • Clay Tandoor & Heritage Spice Recipes</span>
           </div>
           <h2 className="font-serif text-3xl sm:text-4xl font-bold text-[#1A1A1A]">
             Culinary Menu & Offerings
@@ -194,7 +195,7 @@ export const MenuSection: React.FC<MenuSectionProps> = ({ onSelectItem, onQuickA
 
                   {/* Price overlay at bottom */}
                   <div className="absolute bottom-2.5 right-2.5 bg-[#1A1A1A]/90 px-2.5 py-0.5 border border-[#38342E]">
-                    <span className="text-[#F4F1EA] font-serif font-bold text-sm">${item.price.toFixed(2)}</span>
+                    <span className="text-[#F4F1EA] font-serif font-bold text-sm">{formatINR(item.price)}</span>
                   </div>
                 </div>
 

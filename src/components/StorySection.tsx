@@ -12,7 +12,7 @@ export const StorySection: React.FC = () => {
           <div className="lg:col-span-6 space-y-6">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#2A2824] border border-[#38342E] text-[#B84A0E] text-[10px] font-bold uppercase tracking-[0.2em]">
               <Sparkles className="w-3.5 h-3.5" />
-              <span>Gazette Feature • Three Generations of Culinary Mastery</span>
+              <span>Our Heritage • Three Generations of Culinary Mastery</span>
             </div>
 
             <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-[#F4F1EA] leading-tight">

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { NavigationTab } from '../types';
 import { Flame, MapPin, Phone, Mail, Clock, Instagram, Facebook, Send, Check } from 'lucide-react';
+import { api } from '../services/api';
 
 interface FooterProps {
   setActiveTab: (tab: NavigationTab) => void;
@@ -9,13 +10,20 @@ interface FooterProps {
 export const Footer: React.FC<FooterProps> = ({ setActiveTab }) => {
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
+  const [subscriptionError, setSubscriptionError] = useState<string | null>(null);
 
-  const handleSubscribe = (e: React.FormEvent) => {
+  const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
     if (email) {
-      setSubscribed(true);
-      setTimeout(() => setSubscribed(false), 3000);
-      setEmail('');
+      try {
+        await api.createContactMessage(email, 'Newsletter subscription request');
+        setSubscribed(true);
+        setSubscriptionError(null);
+        setTimeout(() => setSubscribed(false), 3000);
+        setEmail('');
+      } catch (error) {
+        setSubscriptionError(error instanceof Error ? error.message : 'Unable to subscribe right now.');
+      }
     }
   };
 
@@ -101,7 +109,7 @@ export const Footer: React.FC<FooterProps> = ({ setActiveTab }) => {
 
           {/* Col 4: Newsletter Discount */}
           <div className="space-y-3">
-            <h4 className="font-serif text-base font-bold text-[#F4F1EA] border-b border-[#38342E] pb-2">Gazette Newsletter</h4>
+            <h4 className="font-serif text-base font-bold text-[#F4F1EA] border-b border-[#38342E] pb-2">Rasoi Updates</h4>
             <p className="text-xs text-[#A39D90] font-serif italic">
               Subscribe for weekly chef special announcements and receive 15% off your next order.
             </p>
@@ -131,6 +139,7 @@ export const Footer: React.FC<FooterProps> = ({ setActiveTab }) => {
                   </>
                 )}
               </button>
+              {subscriptionError && <p className="text-xs text-red-300" role="alert">{subscriptionError}</p>}
             </form>
           </div>
 
@@ -139,7 +148,7 @@ export const Footer: React.FC<FooterProps> = ({ setActiveTab }) => {
         {/* Bottom Bar */}
         <div className="pt-8 border-t border-[#38342E] flex flex-col sm:flex-row items-center justify-between text-[11px] text-[#A39D90] gap-4">
           <div>
-            © {new Date().getFullYear()} Punjabi Tadka Gazette & Culinary House. All rights reserved.
+            © {new Date().getFullYear()} Punjabi Tadka Rasoi & Culinary House. All rights reserved.
           </div>
           <div className="flex gap-4">
             <span className="hover:underline cursor-pointer">Privacy Policy</span>

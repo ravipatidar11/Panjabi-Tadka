@@ -1,6 +1,7 @@
 import React from 'react';
 import { NavigationTab } from '../types';
 import { Calendar, UtensilsCrossed, Star, Flame, ShieldCheck, Clock, ArrowRight, Award } from 'lucide-react';
+import { formatINR } from '../utils/currency';
 
 interface HeroSectionProps {
   setActiveTab: (tab: NavigationTab) => void;
@@ -11,7 +12,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ setActiveTab }) => {
     <div className="relative overflow-hidden bg-[#1A1A1A] text-[#F4F1EA] border-b border-[#38342E]">
       {/* Editorial Watermark / Issue Background Header */}
       <div className="absolute top-4 right-8 text-[120px] font-serif font-bold text-[#2A2824]/40 select-none pointer-events-none leading-none tracking-tighter hidden lg:block">
-        GAZETTE
+        SPICE
       </div>
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-16 md:pt-16 md:pb-20">
@@ -21,18 +22,18 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ setActiveTab }) => {
           <div className="lg:col-span-7 space-y-6 text-left">
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#2A2824] border border-[#38342E] text-[#B84A0E] text-[10px] font-bold uppercase tracking-[0.2em]">
               <Flame className="w-3.5 h-3.5 fill-[#B84A0E]" />
-              <span>Issue No. 24 • Authentic Clay Tandoor & Heritage Spices</span>
+              <span>Amritsar to your table • Authentic Punjabi cooking</span>
             </div>
 
             <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-[#F4F1EA] leading-[1.15]">
               True Taste of Punjab, <br />
               <span className="font-serif italic font-normal text-[#B84A0E]">
-                Served with Royal Elegance.
+                Served with warmth and tradition.
               </span>
             </h1>
 
             <p className="text-base sm:text-lg text-[#C8C2B6] max-w-2xl leading-relaxed font-sans font-normal border-l-2 border-[#B84A0E] pl-4">
-              Experience the rich aromas of 16-hour slow-cooked Dal Makhani, charred Tandoori delicacies, and fresh handmade breads. Crafting culinary memories for family dining, online delivery, and corporate events.
+              Experience the rich aromas of 16-hour slow-cooked Dal Makhani, charred tandoori delicacies, and fresh handmade breads. Crafted for family gatherings, festive celebrations, and everyday cravings.
             </p>
 
             {/* CTA Buttons */}
@@ -121,7 +122,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ setActiveTab }) => {
                     </p>
                   </div>
                   <div className="text-right">
-                    <span className="text-xl font-serif font-bold text-[#B84A0E]">$19.50</span>
+                    <span className="text-xl font-serif font-bold text-[#B84A0E]">{formatINR(1640)}</span>
                     <button 
                       onClick={() => setActiveTab('menu')}
                       className="block text-[10px] uppercase font-bold tracking-wider text-[#A39D90] underline hover:text-[#F4F1EA] mt-0.5"

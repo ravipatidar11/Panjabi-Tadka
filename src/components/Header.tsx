@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { NavigationTab } from '../types';
 import { Utensils, ShoppingBag, Calendar, Phone, Menu, X, Flame, MapPin } from 'lucide-react';
+import { formatINR } from '../utils/currency';
 
 interface HeaderProps {
   activeTab: NavigationTab;
@@ -39,15 +40,15 @@ export const Header: React.FC<HeaderProps> = ({
       <div className="bg-[#1A1A1A] text-[#EBE7DF] text-[11px] py-1.5 px-4 tracking-wider uppercase">
         <div className="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-2">
           <div className="flex items-center gap-2">
-            <span className="flex items-center text-[#B84A0E] font-semibold tracking-widest">
-              <Flame className="w-3.5 h-3.5 mr-1 fill-[#B84A0E]" /> Clay Tandoor & Heritage Spices
+              <span className="flex items-center text-[#B84A0E] font-semibold tracking-widest">
+              <Flame className="w-3.5 h-3.5 mr-1 fill-[#B84A0E]" /> Punjabi Rasoi • Tandoor & Masala
             </span>
             <span className="hidden md:inline text-stone-500">•</span>
-            <span className="hidden md:inline text-stone-300 font-serif italic text-xs capitalize">Vol. XXIV — Open Today: 11:30 AM – 10:30 PM</span>
+            <span className="hidden md:inline text-stone-300 font-serif italic text-xs capitalize">Since 1978 — Open Today: 11:30 AM – 10:30 PM</span>
           </div>
           <div className="flex items-center gap-4 text-[#EBE7DF]/90 text-[11px]">
             <span className="flex items-center gap-1 hover:text-[#B84A0E] transition-colors cursor-pointer" onClick={() => handleNavClick('reservation')}>
-              <MapPin className="w-3 h-3 text-[#B84A0E]" /> 452 Heritage Way, San Jose, CA
+              <MapPin className="w-3 h-3 text-[#B84A0E]" /> Amritsar-inspired Punjabi kitchen
             </span>
             <a href="tel:4085550199" className="hidden sm:flex items-center gap-1 text-[#B84A0E] font-medium hover:underline">
               <Phone className="w-3 h-3" /> (408) 555-0199
@@ -73,7 +74,7 @@ export const Header: React.FC<HeaderProps> = ({
                 Punjabi <span className="font-serif italic font-normal text-[#B84A0E]">Tadka</span>
               </span>
               <span className="text-[9px] tracking-[0.2em] uppercase text-[#666157] font-semibold block mt-1">
-                Heritage Cuisine • Est. 1998
+                Punjabi Rasoi • Est. 1978
               </span>
             </div>
           </button>
@@ -114,7 +115,7 @@ export const Header: React.FC<HeaderProps> = ({
               <span className="hidden md:inline">Order Bag</span>
               {cartCount > 0 && (
                 <span className="bg-[#1A1A1A] text-[#F4F1EA] text-[10px] px-2 py-0.5 font-bold ml-1">
-                  {cartCount} • ${cartTotal.toFixed(2)}
+                  {cartCount} • {formatINR(cartTotal)}
                 </span>
               )}
             </button>

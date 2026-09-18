@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { CATERING_PACKAGES } from '../data/menuData';
 import { CateringInquiry } from '../types';
 import { Utensils, Check, Flame, Users, Calendar, Calculator, CheckCircle2, Send, Sparkles } from 'lucide-react';
+import { formatINR } from '../utils/currency';
+import { api } from '../services/api';
 
 export const CateringSection: React.FC = () => {
   const [selectedPackage, setSelectedPackage] = useState<string>('royal-maharaja');
@@ -17,13 +19,15 @@ export const CateringSection: React.FC = () => {
   const [notes, setNotes] = useState<string>('');
 
   const [submittedInquiry, setSubmittedInquiry] = useState<CateringInquiry | null>(null);
+  const [submissionError, setSubmissionError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const activePkg = CATERING_PACKAGES.find((p) => p.id === selectedPackage) || CATERING_PACKAGES[0];
   const baseCost = activePkg.pricePerPerson * guestCount;
-  const tandoorAddon = liveTandoorOption ? 350 : 0;
+  const tandoorAddon = liveTandoorOption ? 29400 : 0;
   const totalEst = baseCost + tandoorAddon;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !email || !phone || !eventDate) {
       alert('Please fill in your contact information and event date.');
@@ -38,11 +42,20 @@ export const CateringSection: React.FC = () => {
       name,
       email,
       phone,
-      budgetRange: `$${totalEst.toFixed(0)} Estimated`,
+      budgetRange: `${formatINR(totalEst)} Estimated`,
       additionalNotes: notes
     };
 
-    setSubmittedInquiry(inquiry);
+    setSubmissionError(null);
+    setIsSubmitting(true);
+    try {
+      await api.createCateringBooking(inquiry);
+      setSubmittedInquiry(inquiry);
+    } catch (error) {
+      setSubmissionError(error instanceof Error ? error.message : 'Unable to submit the catering request.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -56,7 +69,7 @@ export const CateringSection: React.FC = () => {
             <span>Royal Catering & Live Tandoor Stalls</span>
           </div>
           <h2 className="font-serif text-3xl sm:text-4xl font-bold text-[#1A1A1A]">
-            Punjabi Feast for Weddings & Corporate Events
+            Punjabi Feast for Weddings & Celebrations
           </h2>
           <p className="text-sm sm:text-base text-[#666157] font-serif italic">
             "Elevate your celebrations with authentic Punjabi buffets, live clay tandoor stations, and hand-crafted mithai spreads."
@@ -88,7 +101,7 @@ export const CateringSection: React.FC = () => {
                   <p className="text-xs text-[#666157] font-serif italic mt-1 min-h-[32px]">{pkg.description}</p>
 
                   <div className="my-4 pt-3 border-t border-[#DED9CF]">
-                    <span className="font-serif font-bold text-3xl text-[#B84A0E]">${pkg.pricePerPerson}</span>
+                    <span className="font-serif font-bold text-3xl text-[#B84A0E]">{formatINR(pkg.pricePerPerson)}</span>
                     <span className="text-xs text-[#666157] font-medium ml-1">/ person</span>
                     <div className="text-[10px] uppercase tracking-wider text-[#666157] mt-0.5">Min. {pkg.minGuests} guests</div>
                   </div>
@@ -171,7 +184,7 @@ export const CateringSection: React.FC = () => {
                         Include Live Clay Tandoor Chef Station
                       </span>
                       <span className="text-[11px] text-[#A39D90] font-serif italic block mt-0.5">
-                        Chef cooks piping hot garlic naan & tandoori kebabs live on-site ($350 setup fee).
+                        Chef cooks piping hot garlic naan & tandoori kebabs live on-site ({formatINR(29400)} setup fee).
                       </span>
                     </div>
                   </label>
@@ -181,17 +194,17 @@ export const CateringSection: React.FC = () => {
                 <div className="p-4 bg-[#1A1A1A] border border-[#38342E] space-y-2 text-xs">
                   <div className="flex justify-between text-[#C8C2B6]">
                     <span>Package ({activePkg.name}):</span>
-                    <span>${activePkg.pricePerPerson} × {guestCount} = ${baseCost.toFixed(2)}</span>
+                    <span>{formatINR(activePkg.pricePerPerson)} × {guestCount} = {formatINR(baseCost)}</span>
                   </div>
                   {liveTandoorOption && (
                     <div className="flex justify-between text-[#C8C2B6]">
                       <span>Live Clay Tandoor Setup:</span>
-                      <span>+$350.00</span>
+                      <span>+{formatINR(29400)}</span>
                     </div>
                   )}
                   <div className="pt-2 border-t border-[#38342E] flex justify-between items-center font-bold text-sm text-[#F4F1EA]">
                     <span className="uppercase tracking-wider text-[10px]">Estimated Total:</span>
-                    <span className="text-2xl font-serif font-bold text-[#B84A0E]">${totalEst.toFixed(2)}</span>
+                    <span className="text-2xl font-serif font-bold text-[#B84A0E]">{formatINR(totalEst)}</span>
                   </div>
                 </div>
               </div>
@@ -240,7 +253,7 @@ export const CateringSection: React.FC = () => {
                       className="w-full px-3.5 py-2 bg-[#F4F1EA] border border-[#DED9CF] text-xs text-[#1A1A1A] focus:outline-hidden focus:border-[#B84A0E]"
                     >
                       <option value="Wedding / Anand Karaj">Wedding / Reception</option>
-                      <option value="Corporate Event">Corporate Event / Gala</option>
+                      <option value="Corporate Event">Office Celebration / Gathering</option>
                       <option value="Birthday Celebration">Birthday / Anniversary</option>
                       <option value="Puja / Satsang">Satsang / Religious Gathering</option>
                       <option value="Housewarming">Housewarming Party</option>
@@ -313,8 +326,9 @@ export const CateringSection: React.FC = () => {
                   className="w-full py-3 bg-[#B84A0E] hover:bg-[#9B3C09] text-[#F4F1EA] font-bold text-xs uppercase tracking-widest border border-[#B84A0E] transition-all flex items-center justify-center gap-2"
                 >
                   <Send className="w-4 h-4" />
-                  <span>Submit Catering Inquiry (${totalEst.toFixed(0)} Est.)</span>
+                  <span>{isSubmitting ? 'Submitting Request...' : `Submit Catering Inquiry (${formatINR(totalEst)} Est.)`}</span>
                 </button>
+                {submissionError && <p className="text-xs text-red-700" role="alert">{submissionError}</p>}
               </form>
             )}
           </div>

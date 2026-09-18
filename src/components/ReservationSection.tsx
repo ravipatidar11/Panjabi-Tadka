@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ReservationDetails } from '../types';
 import { Calendar, Clock, Users, MapPin, CheckCircle, Sparkles, Phone, Mail, Info } from 'lucide-react';
+import { api } from '../services/api';
 
 export const ReservationSection: React.FC = () => {
   const [guests, setGuests] = useState<number>(2);
@@ -14,23 +15,24 @@ export const ReservationSection: React.FC = () => {
   const [specialNotes, setSpecialNotes] = useState<string>('');
   
   const [confirmedReservation, setConfirmedReservation] = useState<ReservationDetails | null>(null);
+  const [submissionError, setSubmissionError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const timeSlots = [
     '11:30 AM', '12:15 PM', '1:00 PM', '1:45 PM', 
     '5:30 PM', '6:15 PM', '7:00 PM', '7:45 PM', '8:30 PM', '9:15 PM'
   ];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !phone || !email) {
       alert('Please fill in your name, phone number, and email.');
       return;
     }
 
-    const resCode = 'PT-' + Math.floor(100000 + Math.random() * 900000);
-
+    setSubmissionError(null);
+    setIsSubmitting(true);
     const reservation: ReservationDetails = {
-      id: resCode,
       date,
       time,
       guests,
@@ -42,7 +44,14 @@ export const ReservationSection: React.FC = () => {
       specialNotes: specialNotes || undefined
     };
 
-    setConfirmedReservation(reservation);
+    try {
+      const response = await api.createReservation(reservation);
+      setConfirmedReservation({ ...reservation, id: response.id });
+    } catch (error) {
+      setSubmissionError(error instanceof Error ? error.message : 'Unable to save your reservation.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -53,7 +62,7 @@ export const ReservationSection: React.FC = () => {
         <div className="text-center max-w-2xl mx-auto space-y-3 mb-10 border-b border-[#38342E] pb-8">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#2A2824] border border-[#38342E] text-[#B84A0E] text-[10px] font-bold uppercase tracking-[0.2em]">
             <Calendar className="w-3.5 h-3.5" />
-            <span>Table Reservation • Gazette Gazette Booking</span>
+            <span>Table Reservation • Punjabi Hospitality</span>
           </div>
           <h2 className="font-serif text-3xl sm:text-4xl font-bold text-[#F4F1EA]">
             Reserve Your Dining Experience
@@ -271,8 +280,9 @@ export const ReservationSection: React.FC = () => {
                   type="submit"
                   className="w-full py-3 bg-[#B84A0E] hover:bg-[#9B3C09] text-[#F4F1EA] font-bold text-xs uppercase tracking-widest border border-[#B84A0E] transition-all"
                 >
-                  Confirm Table Reservation
+                  {isSubmitting ? 'Saving Reservation...' : 'Confirm Table Reservation'}
                 </button>
+                {submissionError && <p className="text-xs text-red-300" role="alert">{submissionError}</p>}
               </div>
 
             </form>

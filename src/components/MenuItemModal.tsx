@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { MenuItem, SpiceLevel } from '../types';
 import { X, Flame, Plus, Minus, ShoppingBag, Check, ShieldCheck } from 'lucide-react';
+import { formatINR } from '../utils/currency';
 
 interface MenuItemModalProps {
   item: MenuItem | null;
@@ -85,7 +86,7 @@ export const MenuItemModal: React.FC<MenuItemModalProps> = ({
                 )}
               </div>
               <span className="font-serif font-bold text-2xl text-[#B84A0E]">
-                ${item.price.toFixed(2)}
+                {formatINR(item.price)}
               </span>
             </div>
 
@@ -187,7 +188,7 @@ export const MenuItemModal: React.FC<MenuItemModalProps> = ({
             ) : (
               <>
                 <ShoppingBag className="w-4 h-4" />
-                <span>Add to Order • ${(item.price * quantity).toFixed(2)}</span>
+                <span>Add to Order • {formatINR(item.price * quantity)}</span>
               </>
             )}
           </button>
