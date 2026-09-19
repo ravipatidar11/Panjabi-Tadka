@@ -96,16 +96,8 @@ export const Header: React.FC<HeaderProps> = ({
             ))}
           </nav>
 
-          {/* Right Actions (Reservation + Cart + Mobile Toggle) */}
+          {/* Right Actions (Cart + Mobile Toggle) */}
           <div className="flex items-center gap-3">
-            <button
-              onClick={() => handleNavClick('reservation')}
-              className="hidden sm:inline-flex items-center gap-2 px-4 py-2 border border-[#1A1A1A] text-[#1A1A1A] font-bold text-xs uppercase tracking-widest hover:bg-[#1A1A1A] hover:text-[#F4F1EA] transition-all"
-            >
-              <Calendar className="w-3.5 h-3.5" />
-              <span>Book Table</span>
-            </button>
-
             {/* Shopping Cart Button */}
             <button
               onClick={() => setIsCartOpen(true)}
