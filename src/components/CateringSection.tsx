@@ -69,10 +69,10 @@ export const CateringSection: React.FC = () => {
             <span>Royal Catering & Live Tandoor Stalls</span>
           </div>
           <h2 className="font-serif text-3xl sm:text-4xl font-bold text-[#1A1A1A]">
-            Punjabi Feast for Weddings & Celebrations
+            Signature Feast for Weddings & Celebrations
           </h2>
           <p className="text-sm sm:text-base text-[#666157] font-serif italic">
-            "Elevate your celebrations with authentic Punjabi buffets, live clay tandoor stations, and hand-crafted mithai spreads."
+            "Elevate your celebrations with authentic regional buffets, live clay tandoor stations, and hand-crafted dessert spreads."
           </p>
         </div>
 

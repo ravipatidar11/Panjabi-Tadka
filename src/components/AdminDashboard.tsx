@@ -179,7 +179,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onClose }) => {
         <div className="flex flex-col gap-4 border-b border-[#DED9CF] bg-[#F4F1EA] p-5 md:flex-row md:items-center md:justify-between">
           <div>
             <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#B84A0E]">Operations Hub</p>
-            <h2 className="font-serif text-2xl font-bold">Punjabi Tadka Admin Dashboard</h2>
+            <h2 className="font-serif text-2xl font-bold">Tadka Kitchen Admin Dashboard</h2>
           </div>
 
           <div className="flex items-center gap-3">

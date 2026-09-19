@@ -41,14 +41,14 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-2">
           <div className="flex items-center gap-2">
               <span className="flex items-center text-[#B84A0E] font-semibold tracking-widest">
-              <Flame className="w-3.5 h-3.5 mr-1 fill-[#B84A0E]" /> Punjabi Rasoi • Tandoor & Masala
+              <Flame className="w-3.5 h-3.5 mr-1 fill-[#B84A0E]" /> Indian Kitchen • Tandoor & Spice
             </span>
             <span className="hidden md:inline text-stone-500">•</span>
             <span className="hidden md:inline text-stone-300 font-serif italic text-xs capitalize">Since 1978 — Open Today: 11:30 AM – 10:30 PM</span>
           </div>
           <div className="flex items-center gap-4 text-[#EBE7DF]/90 text-[11px]">
             <span className="flex items-center gap-1 hover:text-[#B84A0E] transition-colors cursor-pointer" onClick={() => handleNavClick('reservation')}>
-              <MapPin className="w-3 h-3 text-[#B84A0E]" /> Amritsar-inspired Punjabi kitchen
+              <MapPin className="w-3 h-3 text-[#B84A0E]" /> Classic Indian kitchen
             </span>
             <a href="tel:4085550199" className="hidden sm:flex items-center gap-1 text-[#B84A0E] font-medium hover:underline">
               <Phone className="w-3 h-3" /> (408) 555-0199
@@ -71,10 +71,10 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
             <div>
               <span className="font-serif text-2xl font-bold tracking-tight text-[#1A1A1A] block leading-none">
-                Punjabi <span className="font-serif italic font-normal text-[#B84A0E]">Tadka</span>
+                Tadka <span className="font-serif italic font-normal text-[#B84A0E]">Kitchen</span>
               </span>
               <span className="text-[9px] tracking-[0.2em] uppercase text-[#666157] font-semibold block mt-1">
-                Punjabi Rasoi • Est. 1978
+                Est. 1978 • Indian Dining
               </span>
             </div>
           </button>

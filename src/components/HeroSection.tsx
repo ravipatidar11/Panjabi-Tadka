@@ -22,18 +22,18 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ setActiveTab }) => {
           <div className="lg:col-span-7 space-y-6 text-left">
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#2A2824] border border-[#38342E] text-[#B84A0E] text-[10px] font-bold uppercase tracking-[0.2em]">
               <Flame className="w-3.5 h-3.5 fill-[#B84A0E]" />
-              <span>Amritsar to your table • Authentic Punjabi cooking</span>
+              <span>From our kitchen • Authentic Indian comfort food</span>
             </div>
 
             <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-[#F4F1EA] leading-[1.15]">
-              True Taste of Punjab, <br />
+              Rich Indian Flavors, <br />
               <span className="font-serif italic font-normal text-[#B84A0E]">
                 Served with warmth and tradition.
               </span>
             </h1>
 
             <p className="text-base sm:text-lg text-[#C8C2B6] max-w-2xl leading-relaxed font-sans font-normal border-l-2 border-[#B84A0E] pl-4">
-              Experience the rich aromas of 16-hour slow-cooked Dal Makhani, charred tandoori delicacies, and fresh handmade breads. Crafted for family gatherings, festive celebrations, and everyday cravings.
+              Experience the rich aromas of slow-cooked classics, charred tandoori favorites, and fresh handmade breads. Crafted for family gatherings, festive celebrations, and everyday cravings.
             </p>
 
             {/* CTA Buttons */}

@@ -17,7 +17,7 @@ export const ReviewsSection: React.FC = () => {
             What Our Guests Are Saying
           </h2>
           <p className="text-sm text-[#666157] font-serif italic">
-            From local food connoisseurs to wedding hosts, discover why Punjabi Tadka is celebrated across the region.
+            From local food connoisseurs to wedding hosts, discover why Tadka Kitchen is celebrated across the region.
           </p>
         </div>
 

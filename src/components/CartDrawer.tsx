@@ -81,7 +81,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
           <div className="p-5 border-b border-[#DED9CF] bg-[#F4F1EA] flex items-center justify-between">
             <div className="flex items-center gap-2">
               <ShoppingBag className="w-5 h-5 text-[#B84A0E]" />
-              <h2 className="font-serif text-xl font-bold text-[#1A1A1A]">Your Order • Rasoi Thali</h2>
+              <h2 className="font-serif text-xl font-bold text-[#1A1A1A]">Your Order • Signature Thali</h2>
               <span className="bg-[#B84A0E] text-[#F4F1EA] text-[10px] font-bold px-2 py-0.5 border border-[#B84A0E]">
                 {cart.reduce((a, b) => a + b.quantity, 0)} Items
               </span>
@@ -152,7 +152,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
             <div className="p-6 text-center flex-1 flex flex-col items-center justify-center space-y-3">
               <ShoppingBag className="w-12 h-12 text-[#B84A0E]/50" />
               <h3 className="font-serif text-lg font-bold text-[#1A1A1A]">Your order is empty</h3>
-              <p className="text-xs text-[#666157] font-serif italic">Explore our menu and add authentic Punjabi specialties to get started.</p>
+              <p className="text-xs text-[#666157] font-serif italic">Explore our menu and add our signature specialties to get started.</p>
               <button
                 onClick={onClose}
                 className="mt-2 px-5 py-2.5 bg-[#B84A0E] text-[#F4F1EA] font-bold text-xs uppercase tracking-widest border border-[#B84A0E]"

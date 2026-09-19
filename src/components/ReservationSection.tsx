@@ -62,13 +62,13 @@ export const ReservationSection: React.FC = () => {
         <div className="text-center max-w-2xl mx-auto space-y-3 mb-10 border-b border-[#38342E] pb-8">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#2A2824] border border-[#38342E] text-[#B84A0E] text-[10px] font-bold uppercase tracking-[0.2em]">
             <Calendar className="w-3.5 h-3.5" />
-            <span>Table Reservation • Punjabi Hospitality</span>
+            <span>Table Reservation • Warm Hospitality</span>
           </div>
           <h2 className="font-serif text-3xl sm:text-4xl font-bold text-[#F4F1EA]">
             Reserve Your Dining Experience
           </h2>
           <p className="text-sm text-[#C8C2B6] font-serif italic">
-            Join us for authentic Punjabi hospitality. Instant confirmation sent via SMS & Email.
+            Join us for authentic hospitality. Instant confirmation sent via SMS & Email.
           </p>
         </div>
 

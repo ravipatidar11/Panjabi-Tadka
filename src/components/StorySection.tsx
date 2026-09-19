@@ -16,11 +16,11 @@ export const StorySection: React.FC = () => {
             </div>
 
             <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-[#F4F1EA] leading-tight">
-              Crafting Pure Punjabi Flavor Since 1978
+              Crafting Signature Indian Flavor Since 1978
             </h2>
 
             <p className="text-base text-[#C8C2B6] leading-relaxed font-sans border-l-2 border-[#B84A0E] pl-4">
-              At <strong className="text-[#B84A0E]">Punjabi Tadka</strong>, food is an expression of warmth, generosity, and celebration. Founded by Master Chef Jagdish Singh in Amritsar, our kitchen honors ancient Punjabi cooking methods.
+              At <strong className="text-[#B84A0E]">Tadka Kitchen</strong>, food is an expression of warmth, generosity, and celebration. Founded by Master Chef Jagdish Singh in Amritsar, our kitchen honors time-honored Indian cooking methods.
             </p>
 
             <p className="text-sm text-[#A39D90] font-serif italic leading-relaxed">

@@ -54,7 +54,7 @@ export const MenuSection: React.FC<MenuSectionProps> = ({ items, onSelectItem, o
         <div className="text-center max-w-3xl mx-auto space-y-3 mb-10 border-b border-[#DED9CF] pb-8">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#EBE7DF] border border-[#DED9CF] text-[#B84A0E] text-[10px] font-bold uppercase tracking-[0.2em]">
             <Flame className="w-3.5 h-3.5 fill-[#B84A0E]" />
-            <span>Rasoi Selection • Clay Tandoor & Heritage Spice Recipes</span>
+            <span>Kitchen Selection • Clay Tandoor & Heritage Spice Recipes</span>
           </div>
           <h2 className="font-serif text-3xl sm:text-4xl font-bold text-[#1A1A1A]">
             Culinary Menu & Offerings

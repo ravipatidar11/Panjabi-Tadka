@@ -40,12 +40,12 @@ export const Footer: React.FC<FooterProps> = ({ setActiveTab }) => {
                 <Flame className="w-5 h-5 fill-[#F4F1EA]" />
               </div>
               <span className="font-serif text-2xl font-bold text-[#F4F1EA]">
-                Punjabi <span className="text-[#B84A0E]">Tadka</span>
+                Tadka <span className="text-[#B84A0E]">Kitchen</span>
               </span>
             </div>
 
             <p className="text-xs text-[#A39D90] font-serif italic leading-relaxed">
-              Authentic Punjabi dining, clay tandoor roasting, and royal event catering. Crafted with passion, fresh white butter, and 45+ years of family heritage.
+              Authentic Indian dining, clay tandoor roasting, and royal event catering. Crafted with passion, fresh ingredients, and 45+ years of family heritage.
             </p>
 
             <div className="flex items-center gap-3 text-[#A39D90] pt-1">
@@ -109,7 +109,7 @@ export const Footer: React.FC<FooterProps> = ({ setActiveTab }) => {
 
           {/* Col 4: Newsletter Discount */}
           <div className="space-y-3">
-            <h4 className="font-serif text-base font-bold text-[#F4F1EA] border-b border-[#38342E] pb-2">Rasoi Updates</h4>
+            <h4 className="font-serif text-base font-bold text-[#F4F1EA] border-b border-[#38342E] pb-2">Kitchen Updates</h4>
             <p className="text-xs text-[#A39D90] font-serif italic">
               Subscribe for weekly chef special announcements and receive 15% off your next order.
             </p>
@@ -148,7 +148,7 @@ export const Footer: React.FC<FooterProps> = ({ setActiveTab }) => {
         {/* Bottom Bar */}
         <div className="pt-8 border-t border-[#38342E] flex flex-col sm:flex-row items-center justify-between text-[11px] text-[#A39D90] gap-4">
           <div>
-            © {new Date().getFullYear()} Punjabi Tadka Rasoi & Culinary House. All rights reserved.
+            © {new Date().getFullYear()} Tadka Kitchen & Culinary House. All rights reserved.
           </div>
           <div className="flex gap-4">
             <span className="hover:underline cursor-pointer">Privacy Policy</span>
