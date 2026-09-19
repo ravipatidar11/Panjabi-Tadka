@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Analytics } from '@vercel/analytics/react';
 import { NavigationTab, MenuItem, CartItem, SpiceLevel } from './types';
 import { MENU_ITEMS } from './data/menuData';
 import { api } from './services/api';
@@ -217,6 +218,7 @@ export default function App() {
 
       {showAdmin && <AdminDashboard onClose={() => setShowAdmin(false)} />}
 
+      <Analytics />
     </div>
   );
 }
