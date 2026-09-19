@@ -1,4 +1,9 @@
+import base64
+import hashlib
+import hmac
+import json
 import os
+import time
 from contextlib import asynccontextmanager
 from datetime import date, datetime
 from decimal import Decimal
@@ -6,16 +11,24 @@ from typing import Any, Optional
 
 from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from sqlalchemy import Date, DateTime, ForeignKey, Numeric, String, Text, create_engine, select
 from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column, relationship, sessionmaker
+
+ORDER_STATUS_FLOW = ["pending", "confirmed", "preparing", "out_for_delivery", "delivered", "cancelled"]
+PAYMENT_STATUS_OPTIONS = ["pending", "paid", "failed", "refunded"]
 
 
 class Settings(BaseSettings):
     database_url: str = "sqlite:///./local.db"
     frontend_url: str = "http://localhost:3000"
     allowed_origins: str = "http://localhost:3000"
+    admin_username: str = "admin"
+    admin_password: str = "admin123"
+    admin_session_secret: str = "punjabi-tadka-admin-secret-change-me"
+    admin_session_ttl_hours: int = 8
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
     @property
@@ -69,7 +82,11 @@ class OrderModel(Base):
     delivery_fee: Mapped[Decimal] = mapped_column(Numeric(12, 2))
     tip_amount: Mapped[Decimal] = mapped_column(Numeric(12, 2))
     total: Mapped[Decimal] = mapped_column(Numeric(12, 2))
+    status: Mapped[str] = mapped_column(String(35), default="pending", index=True)
+    payment_status: Mapped[str] = mapped_column(String(20), default="pending", index=True)
+    admin_notes: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     items: Mapped[list["OrderItemModel"]] = relationship(cascade="all, delete-orphan")
 
 
@@ -78,6 +95,7 @@ class OrderItemModel(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     order_id: Mapped[int] = mapped_column(ForeignKey("orders.id"))
     menu_item_id: Mapped[str] = mapped_column(ForeignKey("menu_items.id"))
+    menu_item: Mapped["MenuItemModel"] = relationship(foreign_keys=[menu_item_id])
     quantity: Mapped[int] = mapped_column()
     spice_level: Mapped[int] = mapped_column()
     special_instructions: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
@@ -175,6 +193,38 @@ class OrderOut(BaseModel):
     delivery_fee: Decimal
     tip_amount: Decimal
     total: Decimal
+    status: str = "pending"
+    payment_status: str = "pending"
+    customer_name: str | None = None
+    phone: str | None = None
+
+
+class OrderItemOut(BaseModel):
+    item_id: str
+    name: str
+    quantity: int
+    spice_level: int
+    unit_price: Decimal
+    special_instructions: str | None = None
+
+
+class AdminOrderOut(BaseModel):
+    order_id: int
+    order_code: str
+    customer_name: str
+    phone: str
+    order_type: str
+    address: str | None = None
+    status: str
+    payment_status: str
+    subtotal: Decimal
+    tax: Decimal
+    delivery_fee: Decimal
+    tip_amount: Decimal
+    total: Decimal
+    created_at: datetime
+    updated_at: datetime
+    items: list[OrderItemOut]
 
 
 class ReservationIn(BaseModel):
@@ -206,12 +256,108 @@ class ContactIn(BaseModel):
     message: str = Field(min_length=2, max_length=2000)
 
 
+class AdminLoginRequest(BaseModel):
+    username: str
+    password: str
+
+
+class AdminStatusUpdate(BaseModel):
+    status: str = Field(..., pattern=r"^(pending|confirmed|preparing|out_for_delivery|delivered|cancelled)$")
+    payment_status: str | None = Field(default=None, pattern=r"^(pending|paid|failed|refunded)$")
+    admin_notes: str | None = Field(default=None, max_length=2000)
+
+
+security = HTTPBearer(auto_error=False)
+
+
+def _b64url(data: bytes) -> str:
+    return base64.urlsafe_b64encode(data).rstrip(b"=").decode("ascii")
+
+
+def _create_admin_token(username: str) -> str:
+    payload = {
+        "sub": username,
+        "exp": int(time.time()) + (settings.admin_session_ttl_hours * 60 * 60),
+        "iat": int(time.time()),
+    }
+    header = {"alg": "HS256", "typ": "admin"}
+    header_segment = _b64url(json.dumps(header, separators=(",", ":")).encode("utf-8"))
+    payload_segment = _b64url(json.dumps(payload, separators=(",", ":")).encode("utf-8"))
+    signing_input = f"{header_segment}.{payload_segment}".encode("utf-8")
+    signature = hmac.new(settings.admin_session_secret.encode("utf-8"), signing_input, hashlib.sha256).digest()
+    return f"{header_segment}.{payload_segment}.{_b64url(signature)}"
+
+
+def _verify_admin_token(token: str) -> str:
+    try:
+        header_segment, payload_segment, signature_segment = token.split(".")
+    except ValueError as exc:
+        raise HTTPException(status_code=401, detail="Invalid admin token") from exc
+    signing_input = f"{header_segment}.{payload_segment}".encode("utf-8")
+    expected_signature = _b64url(hmac.new(settings.admin_session_secret.encode("utf-8"), signing_input, hashlib.sha256).digest())
+    if not hmac.compare_digest(signature_segment, expected_signature):
+        raise HTTPException(status_code=401, detail="Invalid admin token")
+    payload = json.loads(base64.urlsafe_b64decode(payload_segment + "=" * (-len(payload_segment) % 4)))
+    if payload.get("exp", 0) < int(time.time()):
+        raise HTTPException(status_code=401, detail="Admin token expired")
+    return payload.get("sub") or "admin"
+
+
+def _password_hash(value: str) -> str:
+    salt = hashlib.sha256(settings.admin_session_secret.encode("utf-8")).digest()
+    return hashlib.pbkdf2_hmac("sha256", value.encode("utf-8"), salt, 200_000).hex()
+
+
+def _verify_admin_credentials(username: str, password: str) -> bool:
+    return username == settings.admin_username and hmac.compare_digest(_password_hash(password), _password_hash(settings.admin_password))
+
+
 def get_db():
     db = SessionLocal()
     try:
         yield db
     finally:
         db.close()
+
+
+def get_current_admin(credentials: HTTPAuthorizationCredentials = Depends(security), db: Session = Depends(get_db)) -> str:
+    if not credentials:
+        raise HTTPException(status_code=401, detail="Missing admin token")
+    username = _verify_admin_token(credentials.credentials)
+    if username != settings.admin_username:
+        raise HTTPException(status_code=403, detail="Forbidden")
+    return username
+
+
+def serialize_order(order: OrderModel) -> AdminOrderOut:
+    return AdminOrderOut(
+        order_id=order.id,
+        order_code=f"PT-ORD-{order.id:06d}",
+        customer_name=order.customer_name,
+        phone=order.phone,
+        order_type=order.order_type,
+        address=order.address,
+        status=order.status,
+        payment_status=order.payment_status,
+        subtotal=order.subtotal,
+        tax=order.tax,
+        delivery_fee=order.delivery_fee,
+        tip_amount=order.tip_amount,
+        total=order.total,
+        created_at=order.created_at,
+        updated_at=order.updated_at,
+        items=[
+            OrderItemOut(
+                item_id=item.menu_item_id,
+                name=item.menu_item.name,
+                quantity=item.quantity,
+                spice_level=item.spice_level,
+                unit_price=item.unit_price,
+                special_instructions=item.special_instructions,
+            )
+            for item in order.items
+        ],
+    )
 
 
 def seed_menu(db: Session) -> None:
@@ -265,6 +411,102 @@ def root() -> dict[str, str]:
     return {"message": "Punjabi Tadka API is running", "docs": "/docs"}
 
 
+@app.post("/api/admin/login")
+def admin_login(payload: AdminLoginRequest):
+    if payload.username != settings.admin_username or not _verify_admin_credentials(payload.username, payload.password):
+        raise HTTPException(status_code=401, detail="Invalid admin credentials")
+    return {
+        "token": _create_admin_token(payload.username),
+        "username": payload.username,
+        "role": "admin",
+    }
+
+
+@app.get("/api/admin/me")
+def admin_me(username: str = Depends(get_current_admin)):
+    return {"username": username, "role": "admin"}
+
+
+@app.get("/api/admin/dashboard")
+def admin_dashboard(username: str = Depends(get_current_admin), db: Session = Depends(get_db)):
+    orders = db.scalars(select(OrderModel).order_by(OrderModel.created_at.desc())).all()
+    total_revenue = sum((order.total for order in orders), Decimal("0"))
+    metrics = {
+        "total_orders": len(orders),
+        "revenue": float(total_revenue),
+        "pending": sum(1 for order in orders if order.status == "pending"),
+        "delivered": sum(1 for order in orders if order.status == "delivered"),
+        "cancelled": sum(1 for order in orders if order.status == "cancelled"),
+    }
+    return {
+        "metrics": metrics,
+        "orders": [serialize_order(order).model_dump(mode="json") for order in orders],
+    }
+
+
+@app.get("/api/admin/orders", response_model=list[AdminOrderOut])
+def list_admin_orders(
+    username: str = Depends(get_current_admin),
+    db: Session = Depends(get_db),
+    status: str | None = None,
+    search: str | None = None,
+):
+    query = select(OrderModel)
+    if status:
+        query = query.where(OrderModel.status == status)
+    if search:
+        term = f"%{search.lower()}%"
+        query = query.where((OrderModel.customer_name.ilike(term)) | (OrderModel.phone.ilike(term)) | (OrderModel.id.cast(String).ilike(term)))
+    orders = db.scalars(query.order_by(OrderModel.created_at.desc())).all()
+    return [serialize_order(order) for order in orders]
+
+
+@app.patch("/api/admin/orders/{order_id}/status", response_model=AdminOrderOut)
+def update_order_status(
+    order_id: int,
+    payload: AdminStatusUpdate,
+    username: str = Depends(get_current_admin),
+    db: Session = Depends(get_db),
+):
+    order = db.get(OrderModel, order_id)
+    if not order:
+        raise HTTPException(404, "Order not found")
+    if payload.status not in ORDER_STATUS_FLOW:
+        raise HTTPException(400, "Invalid order status")
+    if payload.payment_status is not None and payload.payment_status not in PAYMENT_STATUS_OPTIONS:
+        raise HTTPException(400, "Invalid payment status")
+    order.status = payload.status
+    if payload.payment_status:
+        order.payment_status = payload.payment_status
+    if payload.admin_notes is not None:
+        order.admin_notes = payload.admin_notes
+    order.updated_at = datetime.utcnow()
+    db.commit()
+    db.refresh(order)
+    return serialize_order(order)
+
+
+@app.get("/api/orders/track")
+def track_order(order_code: str, phone: str, db: Session = Depends(get_db)):
+    order_id = int(order_code.replace("PT-ORD-", "")) if order_code.startswith("PT-ORD-") else None
+    order = None
+    if order_id is not None:
+        order = db.get(OrderModel, order_id)
+    if not order:
+        raise HTTPException(404, "Order not found")
+    if order.phone != phone:
+        raise HTTPException(403, "Order phone number does not match")
+    return {
+        "order_id": order.id,
+        "order_code": f"PT-ORD-{order.id:06d}",
+        "customer_name": order.customer_name,
+        "status": order.status,
+        "payment_status": order.payment_status,
+        "total": float(order.total),
+        "updated_at": order.updated_at.isoformat(),
+    }
+
+
 @app.get("/api/menu", response_model=list[MenuItemOut])
 def get_menu(db: Session = Depends(get_db)):
     return [MenuItemOut.from_model(item) for item in db.scalars(select(MenuItemModel).order_by(MenuItemModel.category, MenuItemModel.name)).all()]
@@ -283,7 +525,20 @@ def create_order(payload: OrderIn, db: Session = Depends(get_db)):
     delivery_fee = Decimal("335.00") if payload.order_type == "delivery" else Decimal("0.00")
     tip_amount = (subtotal * payload.tip_percent / Decimal("100")).quantize(Decimal("0.01"))
     total = subtotal + tax + delivery_fee + tip_amount
-    order = OrderModel(customer_name=payload.customer_name, phone=payload.phone, address=payload.address, order_type=payload.order_type, tip_percent=payload.tip_percent, subtotal=subtotal, tax=tax, delivery_fee=delivery_fee, tip_amount=tip_amount, total=total)
+    order = OrderModel(
+        customer_name=payload.customer_name,
+        phone=payload.phone,
+        address=payload.address,
+        order_type=payload.order_type,
+        tip_percent=payload.tip_percent,
+        subtotal=subtotal,
+        tax=tax,
+        delivery_fee=delivery_fee,
+        tip_amount=tip_amount,
+        total=total,
+        status="pending",
+        payment_status="pending",
+    )
     db.add(order)
     db.flush()
     for line in payload.items:
@@ -291,7 +546,20 @@ def create_order(payload: OrderIn, db: Session = Depends(get_db)):
         order.items.append(OrderItemModel(menu_item_id=item.id, quantity=line.quantity, spice_level=line.spice_level, special_instructions=line.special_instructions, unit_price=item.price))
     db.commit()
     db.refresh(order)
-    return OrderOut(order_id=order.id, order_code=f"PT-ORD-{order.id:06d}", subtotal=subtotal, tax=tax, delivery_fee=delivery_fee, tip_amount=tip_amount, total=total)
+    order_code = f"PT-ORD-{order.id:06d}"
+    return OrderOut(
+        order_id=order.id,
+        order_code=order_code,
+        subtotal=subtotal,
+        tax=tax,
+        delivery_fee=delivery_fee,
+        tip_amount=tip_amount,
+        total=total,
+        status=order.status,
+        payment_status=order.payment_status,
+        customer_name=order.customer_name,
+        phone=order.phone,
+    )
 
 
 @app.post("/api/reservations", status_code=status.HTTP_201_CREATED)

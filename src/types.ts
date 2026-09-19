@@ -63,3 +63,57 @@ export interface Review {
   avatar?: string;
   source: 'Google' | 'Yelp' | 'OpenTable';
 }
+
+export type OrderStatus = 'pending' | 'confirmed' | 'preparing' | 'out_for_delivery' | 'delivered' | 'cancelled';
+export type PaymentStatus = 'pending' | 'paid' | 'failed' | 'refunded';
+
+export interface AdminOrderItem {
+  item_id: string;
+  name: string;
+  quantity: number;
+  spice_level: number;
+  unit_price: number;
+  special_instructions?: string | null;
+}
+
+export interface AdminOrder {
+  order_id: number;
+  order_code: string;
+  customer_name: string;
+  phone: string;
+  order_type: 'pickup' | 'delivery';
+  address?: string | null;
+  status: OrderStatus;
+  payment_status: PaymentStatus;
+  subtotal: number;
+  tax: number;
+  delivery_fee: number;
+  tip_amount: number;
+  total: number;
+  created_at: string;
+  updated_at: string;
+  items: AdminOrderItem[];
+}
+
+export interface AdminMetrics {
+  total_orders: number;
+  revenue: number;
+  pending: number;
+  delivered: number;
+  cancelled: number;
+}
+
+export interface AdminDashboardData {
+  metrics: AdminMetrics;
+  orders: AdminOrder[];
+}
+
+export interface CustomerOrderStatus {
+  order_id: number;
+  order_code: string;
+  customer_name: string;
+  status: OrderStatus;
+  payment_status: PaymentStatus;
+  total: number;
+  updated_at: string;
+}
