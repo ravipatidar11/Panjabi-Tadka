@@ -87,3 +87,17 @@ Punjabi-Tadka/
 ├── vercel.json
 ├── vite.config.ts
 └── README.md
+
+
+
+## 🛠️ Development Commands
+
+1. Frontend Install: `npm install`
+2. Frontend Run: `npm run dev`
+3. Backend Directory: `cd backend`
+4. Backend Dependencies: `pip install -r requirements.txt`
+5. Application Directory: `cd app`
+6. Backend Run: `uvicorn main:app --reload --port 8000`
+7. API Documentation: `http://127.0.0.1:8000/docs`
+8. API Test: `curl http://127.0.0.1:8000/api/menu`
+9. Database: `python -m backend.database`
